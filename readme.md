@@ -18,3 +18,4 @@ All content is stored in `~/.cards`.
 - [ ] `browse` should have a shortcuts help overlay
 - [ ] jump to `search` from `browse` by typing `/`
 - [ ] `browse` list pane should include a short preview (first 2 lines?)
+- [ ] the tool should manage a git repo for the ~/.cards dir?

@@ -15,14 +15,17 @@ import (
 
 const DefaultEditor = "vim"
 
-// TODO bring back borders
-
 func Render(dir string) {
 	app := tview.NewApplication()
 	textView := tview.NewTextView().SetDynamicColors(true).SetChangedFunc(func() {
 		app.Draw()
 	})
-	table := tview.NewTable().SetBorders(false)
+	textView.SetBorderPadding(1, 1, 2, 2)
+
+	table := tview.NewTable()
+	table.SetBorders(false)
+	table.SetBorder(true)
+	table.SetBorderPadding(0, 0, 1, 1)
 
 	flex := tview.NewFlex().
 		AddItem(table, 40, 1, true).
@@ -33,13 +36,17 @@ func Render(dir string) {
 	}
 
 	var selectedFile string
+	var fileCount int
 
 	renderFileList := func() {
 		files, _ := ioutil.ReadDir(dir)
-		for i, file := range files {
+		fileCount = 0
+		for _, file := range files {
 			name := file.Name()
 			if !strings.HasPrefix(name, ".") {
-				table.SetCell(i, 0, tview.NewTableCell(file.Name()).SetAlign(tview.AlignLeft))
+				cell := tview.NewTableCell(file.Name()).SetMaxWidth(40).SetExpansion(1)
+				table.SetCell(fileCount, 0, cell)
+				fileCount++
 			}
 		}
 	}
@@ -76,7 +83,7 @@ func Render(dir string) {
 			panic(err)
 		}
 		textView.SetText(tview.TranslateANSI(colored))
-	}).Select(0, 0).SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	}).Select(fileCount-1, 0).SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Rune() {
 		case 'a':
 			err := archive(dir, selectedFile)

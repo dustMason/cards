@@ -13,9 +13,15 @@ All content is stored in `~/.cards`.
 
 ### TODO
 
-- [ ] `browse` should have some single file actions (gist, run)
-- [ ] `browse` should have a shortcuts help overlay
+- [ ] `browse` single file actions 
+    - [x] pbcopy
+    - [x] archive
+    - [x] rename
+    - [ ] gist
+    - [ ] run
+- [ ] instead of switching to a new screen, `browse` `rename` should put the input in the table cell
 - [ ] jump to `search` from `browse` by typing `/`
-- [ ] `browse` list pane should include a short preview (first 2 lines?)
+- [ ] `new` command should prompt for a file suffix. input field overlay?
 - [ ] the tool should manage a git repo for the ~/.cards dir?
-- [ ] shortcut key to open markdown file in browser (render html to tempfile?)
+- [ ] shortcut key to open markdown file in browser? (render html to tempfile?)
+- [ ] a solution for editing notes on mobile and syncing

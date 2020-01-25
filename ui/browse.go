@@ -21,7 +21,6 @@ type BrowsePage struct {
 	app      *tview.Application
 	dir      string
 
-	// SetInputCapture inputCapHandler
 	SelectedFile string
 }
 
@@ -49,7 +48,6 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 		table:    table,
 		app:      app,
 		dir:      dir,
-		// SetInputCapture: inputCapture,
 	}
 
 	table.SetBorders(false)
@@ -72,7 +70,6 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 		}
 		textView.SetText(tview.TranslateANSI(colored))
 	}).Select(fileCount-1, 0).SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		// event = bp.SetInputCapture(event)
 		switch event.Rune() {
 		case 'a':
 			err := actions.Archive(dir, bp.SelectedFile)
@@ -91,15 +88,7 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 		case 'r':
 			events.Emit("show:Rename")
 		case '/':
-			// app.Stop()
-			// file, err := Search(dir)
-			// if err != nil {
-			// 	panic(err)
-			// }
-			// _ = editFile(file)
-			// pages.SwitchToPage("Search")
 			events.Emit("show:Search")
-			// setupSearch()
 		}
 		switch event.Key() {
 		case tcell.KeyEnter:
@@ -127,22 +116,3 @@ func (bp BrowsePage) Draw() int {
 	}
 	return fileCount
 }
-
-// func (bp BrowserPage) SetInputCapture
-
-// func browsePage(app *tview.Application) (*tview.TextView, *tview.Table, *tview.Flex) {
-// 	textView := tview.NewTextView().SetDynamicColors(true).SetChangedFunc(func() {
-// 		app.Draw()
-// 	})
-// 	textView.SetBorderPadding(1, 1, 2, 2)
-//
-// 	table := tview.NewTable()
-// 	table.SetBorders(false)
-// 	table.SetBorder(true)
-// 	table.SetBorderPadding(0, 0, 1, 1)
-//
-// 	flex := tview.NewFlex().
-// 		AddItem(table, 40, 1, true).
-// 		AddItem(textView, 0, 1, false)
-// 	return textView, table, flex
-// }

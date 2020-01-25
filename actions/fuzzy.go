@@ -48,24 +48,4 @@ func CardResults(dir string) (cardResults, error) {
 
 func Fuzzy(contents cardResults, needle string) fuzzy.Matches {
 	return fuzzy.FindFrom(needle, contents)
-
-	// for _, match := range matches {
-	// 	for i := 0; i < len(match.Str); i++ {
-	// 		if contains(i, match.MatchedIndexes) {
-	// 			fmt.Print(fmt.Sprintf(bold, string(match.Str[i])))
-	// 		} else {
-	// 			// fmt.Print(string(match.Str[i]))
-	// 		}
-	// 	}
-	// 	fmt.Println()
-	// }
 }
-
-// func contains(needle int, haystack []int) bool {
-// 	for _, i := range haystack {
-// 		if needle == i {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }

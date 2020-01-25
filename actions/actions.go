@@ -1,4 +1,4 @@
-package main
+package actions
 
 import (
 	"fmt"
@@ -9,7 +9,9 @@ import (
 	"time"
 )
 
-func editFile(path string) error {
+const DefaultEditor = "vim"
+
+func Edit(path string) error {
 	if path == "" {
 		return nil
 	}
@@ -17,10 +19,10 @@ func editFile(path string) error {
 	if editor == "" {
 		editor = DefaultEditor
 	}
-	return run(editor, []string{path})
+	return Run(editor, []string{path})
 }
 
-func run(cmd string, args []string) error {
+func Run(cmd string, args []string) error {
 	executable, execErr := exec.LookPath(cmd)
 	if execErr != nil {
 		return execErr
@@ -30,21 +32,21 @@ func run(cmd string, args []string) error {
 	return syscall.Exec(executable, c, os.Environ())
 }
 
-func archive(dir string, filename string) error {
+func Archive(dir string, filename string) error {
 	return os.Rename(
 		filepath.Join(dir, filename),
 		filepath.Join(dir, ".archive", filename),
 	)
 }
 
-func rename(dir string, old string, new string) error {
+func Rename(dir string, old string, new string) error {
 	return os.Rename(
 		filepath.Join(dir, old),
 		filepath.Join(dir, new),
 	)
 }
 
-func pbcopy(file string) error {
+func Pbcopy(file string) error {
 	pbcopy, err := exec.LookPath("pbcopy")
 	if err != nil {
 		return err
@@ -58,8 +60,8 @@ func pbcopy(file string) error {
 	return c.Run()
 }
 
-func createFile(dir string) error {
+func Create(dir string) error {
 	suffix := "md"
 	path := filepath.Join(dir, fmt.Sprintf("%v.%v", time.Now().Format("2006-01-02-15-04-05"), suffix))
-	return editFile(path)
+	return Edit(path)
 }

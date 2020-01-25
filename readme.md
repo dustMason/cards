@@ -25,3 +25,4 @@ All content is stored in `~/.cards`.
 - [ ] the tool should manage a git repo for the ~/.cards dir?
 - [ ] shortcut key to open markdown file in browser? (render html to tempfile?)
 - [ ] a solution for editing notes on mobile and syncing
+- [ ] tags and linking!

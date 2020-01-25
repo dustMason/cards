@@ -80,6 +80,13 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 		case 'c':
 			_ = actions.Pbcopy(filepath.Join(dir, bp.SelectedFile))
 			app.Stop()
+		case 'p':
+			app.Stop()
+			source, err := ioutil.ReadFile(filepath.Join(dir, bp.SelectedFile))
+			if err != nil {
+				panic(err)
+			}
+			actions.Present(string(source))
 		case 'q':
 			app.Stop()
 		case 'n':

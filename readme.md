@@ -7,6 +7,7 @@ My personal tool for keeping notes.
 - Notes are files
 - CLI only
 - Just `vim` for writing
+- All formats
 - Simple
 - Fast
 
@@ -30,3 +31,8 @@ Keys:
 - Navigation: vim keys
 - Search: `/`
 - Rename: `r`
+- Copy to clipboard: `c`
+- New: `n`
+- Archive: `a` (moves to ~/.cards/.archive)
+- Present: `p`
+- Quit: `q`

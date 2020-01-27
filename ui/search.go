@@ -64,13 +64,11 @@ func NewSearchPage(app *tview.Application, dir string, events *Events) *SearchPa
 			i, _ := table.GetSelection()
 			table.Select(i+1, 0)
 		case tcell.KeyEscape:
-			events.Emit("hide:Search")
+			events.Emit("hide:Search", "")
 		case tcell.KeyEnter:
 			row, column := table.GetSelection()
 			cell := table.GetCell(row, column)
-			filename := filepath.Join(dir, cell.Text)
-			app.Stop()
-			_ = actions.Edit(filename)
+			events.Emit("hide:Search", cell.Text)
 		default:
 			matches := actions.Fuzzy(cardResults, inputField.GetText())
 			table.Clear()
@@ -89,7 +87,7 @@ func NewSearchPage(app *tview.Application, dir string, events *Events) *SearchPa
 			AddItem(inputField, 2, 1, true), 40, 1, false).
 		AddItem(textView, 0, 1, false)
 
-	events.On("show:Search", func() {
+	events.On("show:Search", func(s string) {
 		app.SetFocus(inputField)
 	})
 

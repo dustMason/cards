@@ -9,9 +9,11 @@ import (
 
 type RenamePage struct {
 	Page *tview.Primitive
+
+	originalFilename string
 }
 
-func NewRenamePage(app *tview.Application, dir string, events *Events, file func() string) *RenamePage {
+func NewRenamePage(app *tview.Application, dir string, events *Events) *RenamePage {
 	rp := &RenamePage{}
 	inputField := tview.NewInputField().SetLabel("Enter a new filename: ")
 	inputField.SetBorder(true)
@@ -20,16 +22,17 @@ func NewRenamePage(app *tview.Application, dir string, events *Events, file func
 		switch key {
 		case tcell.KeyEnter:
 			n := inputField.GetText()
-			err := actions.Rename(dir, file(), n)
+			err := actions.Rename(dir, rp.originalFilename, n)
 			if err != nil {
 				panic(err)
 			}
 		}
-		events.Emit("hide:Rename")
+		events.Emit("hide:Rename", "")
 	})
 
-	events.On("show:Rename", func() {
-		inputField.SetText("")
+	events.On("show:Rename", func(filename string) {
+		inputField.SetText(filename)
+		rp.originalFilename = filename
 		app.SetFocus(inputField)
 	})
 

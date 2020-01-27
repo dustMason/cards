@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os/user"
-	"path/filepath"
+	"errors"
+	"os"
 
 	"github.com/rivo/tview"
 
@@ -18,38 +18,40 @@ func main() {
 }
 
 func cardsDir() (string, error) {
-	me, err := user.Current()
-	if err != nil {
-		return "", err
+	d, ok := os.LookupEnv("CARDS_DIR")
+	if !ok {
+		return "", errors.New("please set the CARDS_DIR env var to the directory you wish to store notes")
 	}
-	return filepath.Join(me.HomeDir, ".cards"), nil
+	return d, nil
 }
 
 func showUI(dir string) {
 	app := tview.NewApplication()
 	pages := tview.NewPages()
 	events := ui.NewEvents()
+	bp := &ui.BrowsePage{}
 
-	events.On("show:Rename", func() {
+	events.On("show:Rename", func(s string) {
 		pages.ShowPage("Rename")
 	})
-	events.On("show:Search", func() {
+	events.On("show:Search", func(s string) {
 		pages.SwitchToPage("Search")
 	})
-	events.On("hide:Search", func() {
+	events.On("hide:Search", func(s string) {
 		pages.SwitchToPage("Browse")
+		if s != "" {
+			bp.Select(s)
+		}
 	})
 
-	bp := ui.NewBrowsePage(app, dir, events)
+	bp = ui.NewBrowsePage(app, dir, events)
 	pages.AddPage("Browse", bp.Page, true, true)
 
-	rp := ui.NewRenamePage(app, dir, events, func() string {
-		return bp.SelectedFile
-	})
+	rp := ui.NewRenamePage(app, dir, events)
 	pages.AddPage("Rename", *rp.Page, true, false)
-	events.On("hide:Rename", func() {
+	events.On("hide:Rename", func(s string) {
 		pages.HidePage("Rename")
-		_ = bp.Draw()
+		bp.Reload()
 	})
 
 	sp := ui.NewSearchPage(app, dir, events)

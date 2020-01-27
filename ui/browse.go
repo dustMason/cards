@@ -20,6 +20,7 @@ type BrowsePage struct {
 	table    *tview.Table
 	app      *tview.Application
 	dir      string
+	files    []string
 
 	SelectedFile string
 }
@@ -49,12 +50,11 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 		app:      app,
 		dir:      dir,
 	}
+	bp.Reload()
 
 	table.SetBorders(false)
 	table.SetBorder(true)
 	table.SetBorderPadding(0, 0, 1, 1)
-
-	fileCount := bp.Draw()
 
 	table.SetSelectable(true, true).SetDoneFunc(func(key tcell.Key) {
 		if key == tcell.KeyEscape {
@@ -69,14 +69,14 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 			panic(err)
 		}
 		textView.SetText(tview.TranslateANSI(colored))
-	}).Select(fileCount-1, 0).SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	}).Select(bp.table.GetRowCount()-1, 0).SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Rune() {
 		case 'a':
 			err := actions.Archive(dir, bp.SelectedFile)
 			if err != nil {
 				panic(err)
 			}
-			fileCount = bp.Draw()
+			bp.Reload()
 		case 'c':
 			_ = actions.Pbcopy(filepath.Join(dir, bp.SelectedFile))
 			app.Stop()
@@ -93,9 +93,9 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 			app.Stop()
 			_ = actions.Create(dir)
 		case 'r':
-			events.Emit("show:Rename")
+			events.Emit("show:Rename", bp.SelectedFile)
 		case '/':
-			events.Emit("show:Search")
+			events.Emit("show:Search", "")
 		}
 		switch event.Key() {
 		case tcell.KeyEnter:
@@ -110,16 +110,25 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 	return bp
 }
 
-func (bp BrowsePage) Draw() int {
+func (bp *BrowsePage) Reload() {
 	files, _ := ioutil.ReadDir(bp.dir)
-	fileCount := 0
+	bp.files = []string{}
+	bp.table.Clear()
 	for _, file := range files {
 		name := file.Name()
 		if !strings.HasPrefix(name, ".") {
-			cell := tview.NewTableCell(file.Name()).SetMaxWidth(40).SetExpansion(1)
-			bp.table.SetCell(fileCount, 0, cell)
-			fileCount++
+			bp.files = append(bp.files, name)
+			cell := tview.NewTableCell(name).SetMaxWidth(40).SetExpansion(1)
+			bp.table.SetCell(bp.table.GetRowCount(), 0, cell)
 		}
 	}
-	return fileCount
+}
+
+func (bp *BrowsePage) Select(filename string) {
+	for i, name := range bp.files {
+		if name == filename {
+			bp.table.Select(i, 0)
+			return
+		}
+	}
 }

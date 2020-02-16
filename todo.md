@@ -6,9 +6,10 @@
     - [x] rename
     - [ ] gist
     - [ ] run
+    - [ ] reveal in finder
+- [ ] browse shortcuts
+    - [ ] `s` sort, followed by key
 - [ ] `new` command should prompt for a file suffix. input field overlay?
-- [ ] shortcut key to open markdown file in browser? (render html to tempfile?) or somehow present?
-- [ ] a solution for editing notes on mobile and syncing
 - [ ] tags and linking!
     * tags are just `#tags` anywhere in the contents
     * when looking at a file, parse out any tags

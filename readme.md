@@ -26,13 +26,15 @@ go build && go install
 cards
 ```
 
-Keys:
+##  Shortcuts
 
-- Navigation: vim keys
-- Search: `/`
-- Rename: `r`
-- Copy to clipboard: `c`
-- New: `n`
-- Archive: `a` (moves to ~/.cards/.archive)
-- Present: `p`
-- Quit: `q`
+| Action                                          | Key           |
+|:------------------------------------------------|:--------------|
+| Navigation                                      | vim keys `jk` |
+| Search                                          | `/`           |
+| Rename                                          | `r`           |
+| Copy to Clipboard                               | `c`           |
+| New                                             | `n`           |
+| Archive (move to .archive dir within CARDS_DIR) | `a`           |
+| Present                                         | `p`           |
+| Quit                                            | `q`           |

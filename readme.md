@@ -2,20 +2,20 @@
 
 My personal tool for keeping notes.
 
-## Yes
+## Yes 👍
 
-- Notes are files
-- CLI only
-- Just `vim` for writing
-- All formats
-- Simple
-- Fast
+- ✅ Notes are files
+- ✅ CLI only
+- ✅ Just `vim` for writing
+- ✅ All formats
+- ✅ Simple
+- ✅ Fast
 
-## No
+## No 🙅‍♂️
 
-- Sharing
-- Multi-user
-- Databases
+- ❌ Sharing
+- ❌ Multi-user
+- ❌ Databases
 
 ---
 

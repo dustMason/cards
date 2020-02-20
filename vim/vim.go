@@ -3,6 +3,8 @@ package vim
 import "io/ioutil"
 
 const vimConfig = `
+:imap jj <Esc>
+
 if executable('ag')
 	set grepprg=ag\ --nogroup\ --nocolor
 endif

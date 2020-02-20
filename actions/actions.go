@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"syscall"
 	"time"
+
+	"github.com/dustmason/cards/vim"
 )
 
 const DefaultEditor = "vim"
@@ -14,7 +16,7 @@ const DefaultEditor = "vim"
 func Create(dir string) error {
 	suffix := "md"
 	path := filepath.Join(dir, fmt.Sprintf("%v.%v", time.Now().Format("2006-01-02-15-04-05"), suffix))
-	return Run(editor(), []string{"-c startinsert", path})
+	return Run(editor(), []string{"-c", "startinsert", path})
 }
 
 func Edit(path string) error {
@@ -38,8 +40,13 @@ func Run(cmd string, args []string) error {
 		return execErr
 	}
 	c := []string{cmd}
+	env := os.Environ()
+	if cmd == "vim" || cmd == "nvim" {
+		configFile := vim.CreateConfig()
+		c = append(c, "-u", configFile)
+	}
 	c = append(c, args...)
-	return syscall.Exec(executable, c, os.Environ())
+	return syscall.Exec(executable, c, env)
 }
 
 func Archive(dir string, filename string) error {

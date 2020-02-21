@@ -16,7 +16,12 @@ const DefaultEditor = "vim"
 func Create(dir string) error {
 	suffix := "md"
 	path := filepath.Join(dir, fmt.Sprintf("%v.%v", time.Now().Format("2006-01-02-15-04-05"), suffix))
-	return Run(editor(), []string{"-c", "startinsert", path})
+	editor := editor()
+	args := []string{path}
+	if isVim(editor) {
+		args = append([]string{"-c", "startinsert"}, args...)
+	}
+	return Run(editor, args)
 }
 
 func Edit(path string) error {
@@ -41,7 +46,7 @@ func Run(cmd string, args []string) error {
 	}
 	c := []string{cmd}
 	env := os.Environ()
-	if cmd == "vim" || cmd == "nvim" {
+	if isVim(cmd) {
 		configFile := vim.CreateConfig()
 		c = append(c, "-u", configFile)
 	}
@@ -76,4 +81,8 @@ func Pbcopy(file string) error {
 	}
 	c.Stdin = f
 	return c.Run()
+}
+
+func isVim(editor string) bool {
+	return editor == "vim" || editor == "nvim"
 }

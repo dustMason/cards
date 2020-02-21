@@ -4,6 +4,7 @@ import "io/ioutil"
 
 const vimConfig = `
 :imap jj <Esc>
+set tabstop=4 softtabstop=0 expandtab shiftwidth=2 smarttab
 
 if executable('ag')
 	set grepprg=ag\ --nogroup\ --nocolor

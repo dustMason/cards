@@ -27,14 +27,19 @@ type BrowsePage struct {
 
 func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePage {
 	table := tview.NewTable()
-	textView := tview.NewTextView().SetDynamicColors(true).SetChangedFunc(func() {
-		app.Draw()
-	})
+	textView := tview.NewTextView().
+		SetDynamicColors(true).
+		SetRegions(true).
+		SetChangedFunc(func() {
+			app.Draw()
+		})
 	textView.SetBorderPadding(1, 1, 2, 2)
 	textView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyTab:
 			app.SetFocus(table)
+		case 'J':
+			// TODO highlight next [[link]]
 		}
 		return event
 	})
@@ -68,7 +73,7 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 		if err != nil {
 			panic(err)
 		}
-		textView.SetText(tview.TranslateANSI(colored))
+		textView.SetText(tview.TranslateANSI(tview.Escape(colored)))
 	}).Select(bp.table.GetRowCount()-1, 0).SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Rune() {
 		case 'a':

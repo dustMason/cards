@@ -1,8 +1,11 @@
 package ui
 
 import (
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/gdamore/tcell"
@@ -12,6 +15,8 @@ import (
 )
 
 type inputCapHandler func(event *tcell.EventKey) *tcell.EventKey
+
+var linkPattern = regexp.MustCompile(`\[\[([a-zA-Z0-9_,;: \-\."#]+)\[(\[*)\]\]`)
 
 type BrowsePage struct {
 	Page *tview.Flex
@@ -34,12 +39,41 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 			app.Draw()
 		})
 	textView.SetBorderPadding(1, 1, 2, 2)
+
+	rotateLinkSelection := func(dir int) {
+		currentSelection := "0"
+		if len(textView.GetHighlights()) > 0 {
+			currentSelection = textView.GetHighlights()[0]
+			regionId, _ := strconv.Atoi(currentSelection)
+			regionId += dir
+			if textView.GetRegionText(strconv.Itoa(regionId)) == "" {
+				currentSelection = "0"
+			} else {
+				currentSelection = strconv.Itoa(regionId)
+			}
+		}
+		textView.Highlight(currentSelection).ScrollToHighlight()
+	}
+
 	textView.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		switch event.Rune() {
+		case 'J':
+			rotateLinkSelection(1)
+		case 'K':
+			rotateLinkSelection(-1)
+		case 'q':
+			app.Stop()
+		}
+
 		switch event.Key() {
+		case tcell.KeyEnter:
+			if len(textView.GetHighlights()) > 0 {
+				currentSelection := textView.GetHighlights()[0]
+				link := textView.GetRegionText(currentSelection)
+				events.Emit("show:Search", link)
+			}
 		case tcell.KeyTab:
 			app.SetFocus(table)
-		case 'J':
-			// TODO highlight next [[link]]
 		}
 		return event
 	})
@@ -73,7 +107,8 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 		if err != nil {
 			panic(err)
 		}
-		textView.SetText(tview.TranslateANSI(tview.Escape(colored)))
+		withRegions := addRegions(tview.Escape(colored))
+		textView.SetText(tview.TranslateANSI(withRegions))
 	}).Select(bp.table.GetRowCount()-1, 0).SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Rune() {
 		case 'a':
@@ -113,6 +148,15 @@ func NewBrowsePage(app *tview.Application, dir string, events *Events) *BrowsePa
 	})
 
 	return bp
+}
+
+func addRegions(text string) string {
+	var count int
+	return linkPattern.ReplaceAllStringFunc(text, func(f string) string {
+		result := fmt.Sprintf(`["%d"]%s[""]`, count, f)
+		count++
+		return result
+	})
 }
 
 func (bp *BrowsePage) Reload() {

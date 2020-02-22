@@ -46,12 +46,22 @@ func NewSearchPage(app *tview.Application, dir string, events *Events) *SearchPa
 		if err != nil {
 			panic(err)
 		}
-		textView.SetText(tview.TranslateANSI(colored))
+		textView.SetText(tview.TranslateANSI(tview.Escape(colored)))
 	}
 	table.SetSelectionChangedFunc(changed)
 
 	inputField := tview.NewInputField()
 	cardResults, _ := actions.CardResults(dir)
+
+	showResults := func() {
+		matches := actions.Fuzzy(cardResults, inputField.GetText())
+		table.Clear()
+		for i, r := range matches {
+			table.SetCellSimple(i, 0, cardResults[r.Index].Name)
+		}
+		table.Select(0, 0)
+		changed(0, 0)
+	}
 
 	inputField.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
@@ -70,13 +80,7 @@ func NewSearchPage(app *tview.Application, dir string, events *Events) *SearchPa
 			cell := table.GetCell(row, column)
 			events.Emit("hide:Search", cell.Text)
 		default:
-			matches := actions.Fuzzy(cardResults, inputField.GetText())
-			table.Clear()
-			for i, r := range matches {
-				table.SetCellSimple(i, 0, cardResults[r.Index].Name)
-			}
-			table.Select(0, 0)
-			changed(0, 0)
+			showResults()
 		}
 		return event
 	})
@@ -89,6 +93,10 @@ func NewSearchPage(app *tview.Application, dir string, events *Events) *SearchPa
 
 	events.On("show:Search", func(s string) {
 		app.SetFocus(inputField)
+		if s != "" {
+			inputField.SetText(s)
+			showResults()
+		}
 	})
 
 	sp.Page = flex
